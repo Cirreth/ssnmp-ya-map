@@ -70,7 +70,8 @@ function Map(containerId, mapOptions) {
         zoom: mapOptions.zoom === undefined ? 9 : mapOptions.zoom,
         behaviors: mapOptions.behaviors ? ['default'] : mapOptions.behaviors,
         controls: mapOptions.controls ? [] : mapOptions.controls,
-        ambulancesClustererOptions: mapOptions.ambulancesClustererOptions
+        ambulancesClustererOptions: mapOptions.ambulancesClustererOptions,
+        displayJams: mapOptions.displayJams || false
     }
 
     loadScript(self.config.apiUrl, onScriptLoad);
@@ -105,6 +106,18 @@ function Map(containerId, mapOptions) {
                 var layout = ymaps.templateLayoutFactory.createClass(layouts[i].template);
                 ymaps.layout.storage.add(layouts[i].name, layout);
             }
+        }
+        if (self.config.mapOptions.displayJams) {
+            var trafficControl = new ymaps.control.TrafficControl({ state: {
+                // Отображаются пробки "Сейчас".
+                providerKey: 'traffic#actual',
+                // Начинаем сразу показывать пробки на карте.
+                trafficShown: true
+            }});
+            // Добавим контрол на карту.
+            self.map.controls.add(trafficControl);
+            // Получим ссылку на провайдер пробок "Сейчас" и включим показ инфоточек.
+            trafficControl.getProvider('traffic#actual').state.set('infoLayerShown', true);
         }
         /* создаем кластеризатор или коллекцию, в зависимости от того, включен ли кластеризатор */
         if (self.config.mapOptions.ambulancesClustererOptions) {
