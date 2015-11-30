@@ -8,10 +8,11 @@
   },
   "author": "",
   "window": {
+    "frame": false,
     "toolbar": false,
     "width": 1000,
     "height": 620,
-	"fullscreen": true
+	"fullscreen": false
   },
   "license": "ISC",
   "dependencies": {

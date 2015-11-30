@@ -16,6 +16,12 @@
 
     <script>
 
+        var gui = require('nw.gui');
+        var win = gui.Window.get();
+        win.x = window.screen.width-7;
+        win.maximize();
+
+
         /**
 		 * Запуск сервера, в том числе для выдачи статики
 		**/
@@ -94,20 +100,20 @@
 
     </script>
 
-    <script>
-        var gulp = require('gulp');
+    <!--<script>-->
+        <!--var gulp = require('gulp');-->
 
-        gulp.task('reload', function () {
+        <!--gulp.task('reload', function () {-->
 
-            setTimeout(function() {
-                if (location) location.reload();
-            }, 1000);
+            <!--setTimeout(function() {-->
+                <!--if (location) location.reload();-->
+            <!--}, 1000);-->
 
-        });
+        <!--});-->
 
-        gulp.watch(['static/**/*', 'index.html'], ['reload']);
+        <!--gulp.watch(['static/**/*', 'index.html'], ['reload']);-->
 
-    </script>
+    <!--</script>-->
 
 </body>
 </html>
