@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ru" ng-app="NwJsYandexMap">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8">
+	<meta charset="utf-8">
+	<title>YandexSSNMP</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<base href="http://localhost:3000"/>
+
+</head>
+	
+<body>
+
+    <!-- Контейнер карты -->
+    <div id="map"></div>
+
+    <script>
+
+        /**
+		 * Запуск сервера, в том числе для выдачи статики
+		**/
+		var express = require('express');
+		var expressApplication = express();
+		var http = require('http').Server(expressApplication);
+		var io = require('socket.io')(http);
+        var bodyParser = require('body-parser')
+        expressApplication.use(bodyParser.json({limit: '50mb'}));
+		expressApplication.use(express.static('static'));
+
+		expressApplication.initRoutes = function(map) {
+
+            var mapAPI = new ssnmp.MapAPI(map);
+
+			expressApplication.post('/', function (req, res) {
+                var params =  req.body;
+                var action = params.action;
+                if (!action) {
+                    var message = 'Action is not defined in request body';
+                    res.send(message);
+                    return;
+                }
+                var actionHandler = mapAPI[action];
+                if (!actionHandler) {
+                    var message = 'Unknown action: '+action;
+                    res.send(message);
+                    return;
+                }
+                var result = mapAPI[action](params);
+				res.send({status: 'ok', result: result});
+			});
+
+		}
+
+		http.listen(3000, function(){
+		  console.log('listening on *:3000');
+		});
+		/* end */
+	
+	</script>
+
+    <!-- Application CSS -->
+    <link rel="stylesheet" type="text/css" href="css/style.css"/>
+
+    <!-- Application scripts -->
+    <script src="js/client.js"></script>
+    <script>
+
+        var map = new ssnmp.Map('map', {
+            center: [55.851574, 37.573856],
+            zoom: 12,
+            behaviors: ['default'],
+            controls: [],
+            ambulancesClustererOptions: {
+                preset: 'islands#darkGreenClusterIcons',
+                groupByCoordinates: false,
+                maxZoom: 16,
+                minClusterSize: 5
+            }
+        });
+
+        function onMapReady() {
+//            map.addAmbulance({id: '1', position: [55.833574, 37.674856], ambulanceType: 'busy'});
+//            map.addAmbulance({id: '2', position: [55.833574, 37.474856]});
+//            map.setCallPosition([55.833574, 37.564856]);
+//            map.showCircle([55.833574, 37.564856], 1000);
+//            map.addBalloon('Привет!', [55.87204, 37.63544]);
+//            map.addHospital([55.77204, 37.63544]);
+            expressApplication.initRoutes(map);
+        }
+
+        map.ready = onMapReady;
+
+        window.map = map;
+
+    </script>
+
+    <script>
+        var gulp = require('gulp');
+
+        gulp.task('reload', function () {
+
+            setTimeout(function() {
+                if (location) location.reload();
+            }, 1000);
+
+        });
+
+        gulp.watch(['static/**/*', 'index.html'], ['reload']);
+
+    </script>
+
+</body>
+</html>
