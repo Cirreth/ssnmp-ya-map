@@ -231,49 +231,60 @@ function Map(containerId, mapOptions) {
             || amb1.position[1] !== amb2.position[1]
             || amb1.type !== amb2.type;
     }
+	
+	/* extra */
+	
+	var getPresetByType = function(ambulance) {
+		switch (ambulance.type) {
+			case 'busy':
+				return 'ambulanceBusyMarker';
+			default:
+				return 'ambulanceMarker';
+		}
+	}
+
+	var pickAmbulanceMarker = function(ambulance) {
+		return new ymaps.Placemark(
+			ambulance.position,
+			{iconContent: ambulance.id},
+			self.getMarkerPreset(getPresetByType(ambulance))
+		);
+	}
+
+	var pushAmbulance = function(ambulance) {
+		ambulance.marker = pickAmbulanceMarker(ambulance);
+		self.layers.ambulancesContainer.add(ambulance.marker);
+		self.objects.ambulances.push(ambulance);
+	}
+	
+	
+	/* =========== */
 
     /**
      * Отрисовывает маркер "Бригада" на карте в указанной позиции
      * @param position Координаты бригады. e.g.: [55.77204, 37.63544]
      * @param ambulancesType Тип бригады ( busy - занятая )
      */
+	/*
+	window.mp=0;
+	window.mr=0;
+	window.rv=0;
+	*/
     this.addAmbulance = function (ambulance) {
-
-        var self = this;
-
-        var getPresetByType = function(ambulance) {
-            console.log('ambulance', ambulance);
-            switch (ambulance.type) {
-                case 'busy':
-                    return 'ambulanceBusyMarker';
-                default:
-                    return 'ambulanceMarker';
-            }
-        }
-
-        var pickAmbulanceMarker = function(ambulance) {
-            return new ymaps.Placemark(
-                ambulance.position,
-                {iconContent: ambulance.id},
-                self.getMarkerPreset(getPresetByType(ambulance))
-            );
-        }
-
-        var pushAmbulance = function(ambulance) {
-            ambulance.marker = pickAmbulanceMarker(ambulance);
-            self.layers.ambulancesContainer.add(ambulance.marker);
-            self.objects.ambulances.push(ambulance);
-        }
 
         if (!ambulance || !ambulance.id || !ambulance.position) {
             throw new Error('Ambulance is not defined or corrupted');
         }
-
-        var existingAmbulance = self.ambulanceById(ambulance.id);
+	
+		var existingAmbulance = self.ambulanceById(ambulance.id);
         if (existingAmbulance) {
             if (hasAmbulancesDiff(ambulance, existingAmbulance)) {
-                self.layers.ambulancesContainer.remove(existingAmbulance.marker);
+				// var b = (new Date).getTime();
+				self.removeAmbulances([ambulance.id]);
+				//mr += (new Date).getTime() - b;
+				//var b = (new Date).getTime();
                 pushAmbulance(ambulance);
+				//mp += (new Date).getTime() - b;
             }
         } else {
             pushAmbulance(ambulance);
@@ -305,16 +316,12 @@ function Map(containerId, mapOptions) {
      * @param ambulances Описание бригад. e.g.: [{id: "21-201", position: [55.77204, 37.63544], type: "busy"}, {id: "21-201", coo...}]
      */
     this.addAmbulances = function (ambulances) {
-        var self = this;
         if (!ambulances || !ambulances.length) {
             throw new Error('Ambulances is not defined');
         }
-        if (ambulances.map(function (ambulance) {
-                return ambulance.id;
-            }))
-            ambulances.map(function (ambulance) {
-                return self.addAmbulance(ambulance);
-            });
+		for (var i=ambulances.length-1; i>=0; i--) {
+			self.addAmbulance(ambulances[i]);
+		};
     }
 
     /**
