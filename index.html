@@ -15,10 +15,17 @@
     <div id="map"></div>
 
     <script>
-
+	
+		var pjson = require('./package.json');
+		console.log(pjson.window.runOnDisplay);
+		
         var gui = require('nw.gui');
         var win = gui.Window.get();
-        win.x = window.screen.width-7;
+		if (pjson.window.runOnDisplay === "left") {
+			win.x = -700;
+		} else if (pjson.window.runOnDisplay === "right") {
+			win.x = window.screen.width+10;
+		}
         win.maximize();
 
 

@@ -12,7 +12,8 @@
     "toolbar": true,
     "width": 1000,
     "height": 620,
-	"fullscreen": false
+	"fullscreen": false,
+	"runOnDisplay": "left"
   },
   "license": "ISC",
   "dependencies": {
