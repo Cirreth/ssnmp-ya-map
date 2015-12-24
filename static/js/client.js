@@ -134,18 +134,25 @@ function Map(containerId, mapOptions) {
         }
         if (self.ready) self.ready();
     }
-
+	
     this.ambulanceById = function(id) {
-        var filtered = self.objects.ambulances.filter(function(x) { return x.id === id; });
-        return filtered.length ? filtered[0] : null;
+		var ambulaces = this.objects.ambulances;
+		for (var idx=0, lastIdx=ambulaces.length; idx<lastIdx; idx++) {
+			if (ambulaces[idx].id == id) {
+				return ambulaces[idx];
+			}
+		}
+		return null;
     }
 
 
     this.addLayout = function (name, template) {
-        this.layouts.push({
+		var layout = {
             name: name,
             template: template
-        })
+        };
+        this.layouts.push(layout);
+		return layout;
     }
 
     this.deleteLayout = function (name) {
@@ -190,8 +197,10 @@ function Map(containerId, mapOptions) {
         }
         if (this.objects.callMarker) {
             this.map.geoObjects.remove(this.objects.callMarker);
-        }
-        this.objects.callMarker = new ymaps.Placemark(position, {}, this.getMarkerPreset('callMarker'));
+			this.objects.callMarker.geometry.setCoordinates(position);
+        } else {
+			this.objects.callMarker = new ymaps.Placemark(position, {}, this.getMarkerPreset('callMarker'));
+		}
         this.map.geoObjects.add(this.objects.callMarker);
     }
 
@@ -204,19 +213,22 @@ function Map(containerId, mapOptions) {
         if (!position || !radius) return;
         var circle = this.objects.circle;
         if (circle) {
-            this.hideCircle();
-        }
-        var circle = new ymaps.Circle([
-            position,
-            radius
-        ], {}, {
-            fillColor: "#FFFFFF88",
-            strokeColor: "#0099DD",
-            strokeOpacity: 0.8,
-            strokeWidth: 2
-        });
+            this.map.geoObjects.remove(circle);
+			this.objects.circle.geometry.setCoordinates(position);
+			this.objects.circle.geometry.setRadius(radius);
+        } else {
+			circle = new ymaps.Circle([
+				position,
+				radius
+			], {}, {
+				fillColor: "#FFFFFF88",
+				strokeColor: "#0099DD",
+				strokeOpacity: 0.8,
+				strokeWidth: 2
+			});
+		}
         this.map.geoObjects.add(circle);
-        this.objects.circle = circle;
+		this.objects.circle = circle;
     }
 
     /**
@@ -243,18 +255,12 @@ function Map(containerId, mapOptions) {
 		}
 	}
 
-	var pickAmbulanceMarker = function(ambulance) {
+	var pickNewAmbulanceMarker = function(ambulance) {
 		return new ymaps.Placemark(
 			ambulance.position,
 			{iconContent: ambulance.id},
 			self.getMarkerPreset(getPresetByType(ambulance))
 		);
-	}
-
-	var pushAmbulance = function(ambulance) {
-		ambulance.marker = pickAmbulanceMarker(ambulance);
-		self.layers.ambulancesContainer.add(ambulance.marker);
-		self.objects.ambulances.push(ambulance);
 	}
 	
 	
@@ -265,31 +271,20 @@ function Map(containerId, mapOptions) {
      * @param position Координаты бригады. e.g.: [55.77204, 37.63544]
      * @param ambulancesType Тип бригады ( busy - занятая )
      */
-	/*
-	window.mp=0;
-	window.mr=0;
-	window.rv=0;
-	*/
     this.addAmbulance = function (ambulance) {
 
         if (!ambulance || !ambulance.id || !ambulance.position) {
             throw new Error('Ambulance is not defined or corrupted');
         }
-	
-		var existingAmbulance = self.ambulanceById(ambulance.id);
-        if (existingAmbulance) {
-            if (hasAmbulancesDiff(ambulance, existingAmbulance)) {
-				// var b = (new Date).getTime();
-				self.removeAmbulances([ambulance.id]);
-				//mr += (new Date).getTime() - b;
-				//var b = (new Date).getTime();
-                pushAmbulance(ambulance);
-				//mp += (new Date).getTime() - b;
-            }
-        } else {
-            pushAmbulance(ambulance);
-        }
-
+		var existingAmbulance = this.ambulanceById(ambulance.id);
+		if (existingAmbulance !== null) {
+			existingAmbulance.marker.geometry.setCoordinates(ambulance.position);
+			existingAmbulance.marker.options.set('iconLayout', self.getMarkerPreset(getPresetByType(ambulance)).iconLayout);
+		} else {
+			ambulance.marker = pickNewAmbulanceMarker(ambulance);
+			this.layers.ambulancesContainer.add(ambulance.marker);
+			this.objects.ambulances.push(ambulance);
+		}
     }
 
     /**
@@ -320,7 +315,7 @@ function Map(containerId, mapOptions) {
             throw new Error('Ambulances is not defined');
         }
 		for (var i=ambulances.length-1; i>=0; i--) {
-			self.addAmbulance(ambulances[i]);
+			this.addAmbulance(ambulances[i]);
 		};
     }
 
@@ -466,7 +461,7 @@ function MapAPI(map) {
     }
 
     this.updateAmbulances = function (requestParams) {
-        this.map.removeAllAmbulances();
+        //this.map.removeAllAmbulances();
         this.map.addAmbulances(requestParams.ambulances);
     }
 
