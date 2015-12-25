@@ -136,10 +136,10 @@ function Map(containerId, mapOptions) {
     }
 	
     this.ambulanceById = function(id) {
-		var ambulaces = this.objects.ambulances;
-		for (var idx=0, lastIdx=ambulaces.length; idx<lastIdx; idx++) {
-			if (ambulaces[idx].id == id) {
-				return ambulaces[idx];
+		var ambulances = this.objects.ambulances;
+		for (var idx=0, lastIdx=ambulances.length; idx<lastIdx; idx++) {
+			if (ambulances[idx].id == id) {
+				return ambulances[idx];
 			}
 		}
 		return null;
@@ -326,6 +326,16 @@ function Map(containerId, mapOptions) {
         this.objects.ambulances = [];
         this.layers.ambulancesContainer.removeAll();
     }
+	
+	this.removeAmbulancesNotInList = function(ambulances) {
+		var idsToRemove = this.objects.ambulances.filter(function(ambulance) {
+			for (var idx=0, maxIdx=ambulances.length; idx<maxIdx; idx++) {
+				if (ambulances[idx].id === ambulance.id) return false;
+			}
+			return true;
+		});
+		this.removeAmbulances(idsToRemove);
+	}
 
     /**
      * Удаляет точки типа "Бригада" с id из массива с карты
@@ -457,11 +467,11 @@ function MapAPI(map) {
     this.updateAmbulance = function (requestParams) {
         var ambulance = requestParams.ambulance;
         this.map.removeAmbulances([ambulance.id]);
-        this.map.addAmbulance(requestParams.ambulance);
+		this.map.addAmbulance(requestParams.ambulance);
     }
 
     this.updateAmbulances = function (requestParams) {
-        //this.map.removeAllAmbulances();
+        this.map.removeAmbulancesNotInList(requestParams.ambulances);
         this.map.addAmbulances(requestParams.ambulances);
     }
 

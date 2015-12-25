@@ -9,7 +9,7 @@
   "author": "",
   "window": {
     "frame": false,
-    "toolbar": true,
+    "toolbar": false,
     "width": 1000,
     "height": 620,
 	"fullscreen": false,
