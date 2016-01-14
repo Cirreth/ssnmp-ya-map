@@ -1,4 +1,12 @@
 {
+  "ssnmpMap": {
+    "productionEnvironment": false,
+	"enableTrafficJams": true,
+	"routeBoundsAutoApply": false,
+	"enableClusterer": false,
+	"initPosition": [55.851574, 37.573856],
+	"initZoom": 12
+  },
   "name": "nw-app",
   "version": "1.0.0",
   "description": "",

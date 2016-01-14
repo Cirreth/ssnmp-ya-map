@@ -17,17 +17,19 @@
     <script>
 	
 		var pjson = require('./package.json');
-		console.log(pjson.window.runOnDisplay);
-		/*
-        var gui = require('nw.gui');
-		var win = gui.Window.get();
-		if (pjson.window.runOnDisplay === "left") {
-			win.x = -700;
-		} else if (pjson.window.runOnDisplay === "right") {
-			win.x = window.screen.width+10;
+		
+		if (pjson.ssnmpMap.productionEnvironment === true) {
+			/* Применяем настройки позиционирования окна только на прод. среде */
+			var gui = require('nw.gui');
+			var win = gui.Window.get();
+			if (pjson.window.runOnDisplay === "left") {
+				win.x = -700;
+			} else if (pjson.window.runOnDisplay === "right") {
+				win.x = window.screen.width+10;
+			}
+			win.maximize();
 		}
-        win.maximize();
-		*/
+        
         /**
 		 * Запуск сервера, в том числе для выдачи статики
 		**/
@@ -83,31 +85,25 @@
     <!-- Application scripts -->
     <script src="js/client.js"></script>
     <script>
+	
+		var clustererOptions = {
+			preset: 'islands#darkGreenClusterIcons',
+			groupByCoordinates: false,
+			maxZoom: 16,
+			minClusterSize: 5
+		};
 
         var map = new ssnmp.Map('map', {
-            center: [55.851574, 37.573856],
-            zoom: 12,
+            center: pjson.ssnmpMap.initPosition || [55.851574, 37.573856],
+            zoom: pjson.ssnmpMap.initZoom || 12,
             behaviors: ['default'],
             controls: [],
-			/*
-            ambulancesClustererOptions: {
-                preset: 'islands#darkGreenClusterIcons',
-                groupByCoordinates: false,
-                maxZoom: 16,
-                minClusterSize: 5
-            },
-			*/
-            displayJams: true,
-			routeBoundsAutoApply: false
+            ambulancesClustererOptions: pjson.ssnmpMap.productionEnvironment === true ? clustererOptions : undefined,
+            displayJams: pjson.ssnmpMap.productionEnvironment || true,
+			routeBoundsAutoApply: pjson.ssnmpMap.routeBoundsAutoApply || false
         });
 
         function onMapReady() {
-//            map.addAmbulance({id: '1', position: [55.833574, 37.674856], ambulanceType: 'busy'});
-//            map.addAmbulance({id: '2', position: [55.833574, 37.474856]});
-//            map.setCallPosition([55.833574, 37.564856]);
-//            map.showCircle([55.833574, 37.564856], 1000);
-//            map.addBalloon('Привет!', [55.87204, 37.63544]);
-//            map.addHospital([55.77204, 37.63544]);
             expressApplication.initRoutes(map);
         }
 
@@ -117,20 +113,25 @@
 
     </script>
 
-    <!--<script>-->
-        <!--var gulp = require('gulp');-->
+    <script>
+	
+		if (pjson.ssnmpMap.productionEnvironment === false) {
+			
+			var gulp = require('gulp');
 
-        <!--gulp.task('reload', function () {-->
+			gulp.task('reload', function () {
 
-            <!--setTimeout(function() {-->
-                <!--if (location) location.reload();-->
-            <!--}, 1000);-->
+				setTimeout(function() {
+					if (location) location.reload();
+				}, 1000);
 
-        <!--});-->
+			});
 
-        <!--gulp.watch(['static/**/*', 'index.html'], ['reload']);-->
+			gulp.watch(['static/**/*', 'index.html'], ['reload']);
+			
+		}
 
-    <!--</script>-->
+    </script>
 
 </body>
 </html>

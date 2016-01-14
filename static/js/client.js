@@ -178,7 +178,6 @@ function Map(containerId, mapOptions) {
 		return null;
     }
 
-
     this.addLayout = function (name, template) {
 		var layout = {
             name: name,
@@ -444,7 +443,6 @@ function Map(containerId, mapOptions) {
 			var centerPosition = activeRoute.getPaths().get(0).getSegments().get(segments.getLength()/2-1).model.geometry.get(0);
 			var durationText = activeRoute.getPaths().get(0).properties.get('durationInTraffic.text');
 			self.layers.routeContainer.add(new ymaps.Placemark(centerPosition, {iconContent: durationText}, self.getMarkerPreset('routeBalloonMarker')));
-			
         });
 		
 		this.layers.routeContainer.add(this.objects.route);
