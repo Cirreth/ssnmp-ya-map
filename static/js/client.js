@@ -21,8 +21,8 @@ function Map(containerId, mapOptions) {
             preset: 'islands#darkGreenDotIcon',
             zIndex: 1000
         },
-		routeBalloon: {
-			preset: 'islands#pinkStretchyIcon',
+		routeBalloonMarker: {
+			iconLayout: 'my#routeBalloon',
 			zIndex: 900
 		},
         primaryMarker: {
@@ -51,7 +51,8 @@ function Map(containerId, mapOptions) {
             zIndex: 1000
         },
         balloonMarker: {
-            preset: 'islands#nightStretchyIcon'
+			iconLayout: 'my#balloon',
+            zIndex: 500
         }
     };
 
@@ -87,6 +88,12 @@ function Map(containerId, mapOptions) {
         }, {
             name: 'my#ambulanceDefault',
             template: '<div class="ambulance-layout-container"><div class="ambulance-layout ambulance-layout-default"></div></div>'
+        }, {
+            name: 'my#balloon',
+            template: '<div class="ssnmp-map-balloon">{{ properties.iconContent }}</div>'
+        }, {
+            name: 'my#routeBalloon',
+            template: '<div class="ssnmp-map-balloon ssnmp-map-balloon-route">{{ properties.iconContent }}</div>'
         }
     ];
 
@@ -436,7 +443,7 @@ function Map(containerId, mapOptions) {
 			var segments = activeRoute.getPaths().get(0).getSegments();
 			var centerPosition = activeRoute.getPaths().get(0).getSegments().get(segments.getLength()/2-1).model.geometry.get(0);
 			var durationText = activeRoute.getPaths().get(0).properties.get('durationInTraffic.text');
-			self.layers.routeContainer.add(new ymaps.Placemark(centerPosition, {iconContent: durationText}, self.getMarkerPreset('routeBalloon')));
+			self.layers.routeContainer.add(new ymaps.Placemark(centerPosition, {iconContent: durationText}, self.getMarkerPreset('routeBalloonMarker')));
 			
         });
 		

@@ -41,6 +41,42 @@ header h1 {
 	text-align: center;
 }
 
+/* макет балуна */
+.ssnmp-map-balloon {
+	position: absolute;
+	padding: 1px 4px;
+	border: 2px solid rgb(0, 143, 191);
+	border-radius: 8px;
+	background-color: white;
+    color: black;
+	font: Arial;
+	font-size: 22px;
+    font-weight: 400;
+    white-space: nowrap;
+}
+
+.ssnmp-map-balloon:before {
+    content: "";
+	display: block;
+	width: 0; 
+	height: 0; 
+	border-right: 10px solid transparent;
+	border-top: 10px solid transparent;
+	border-bottom: 10px solid rgb(0, 143, 191);
+	position: absolute;
+	top: -20px;
+	left: 0px;
+}
+
+/* макет балуна маршрута*/
+.ssnmp-map-balloon.ssnmp-map-balloon-route {
+	border: 2px solid rgb(187, 0, 191);
+}
+
+.ssnmp-map-balloon.ssnmp-map-balloon-route:before {
+	border-bottom: 10px solid rgb(187, 0, 191);
+}
+
 /* макет метки */
 .ambulance-layout {
 	position: absolute;
