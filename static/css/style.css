@@ -70,6 +70,7 @@ header h1 {
 
 /* макет балуна маршрута*/
 .ssnmp-map-balloon.ssnmp-map-balloon-route {
+	font-size: 18px;
 	border: 2px solid rgb(187, 0, 191);
 }
 

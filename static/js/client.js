@@ -440,7 +440,8 @@ function Map(containerId, mapOptions) {
 		this.objects.route.model.events.once("requestsuccess", function () {
             var activeRoute = self.objects.route.getActiveRoute();
 			var segments = activeRoute.getPaths().get(0).getSegments();
-			var centerPosition = activeRoute.getPaths().get(0).getSegments().get(segments.getLength()/2-1).model.geometry.get(0);
+			var midSegmentNumber = segments.getLength()/2 - 1;
+			var centerPosition = activeRoute.getPaths().get(0).getSegments(midSegmentNumber < 0 ? 0 : midSegmentNumber).get().model.geometry.get(0);
 			var durationText = activeRoute.getPaths().get(0).properties.get('durationInTraffic.text');
 			self.layers.routeContainer.add(new ymaps.Placemark(centerPosition, {iconContent: durationText}, self.getMarkerPreset('routeBalloonMarker')));
         });
