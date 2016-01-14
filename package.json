@@ -18,5 +18,8 @@
   "license": "ISC",
   "dependencies": {
     "pretty-bytes": "^1.0.2"
+  },
+  "webkit": {
+	"page-cache": true
   }
 }

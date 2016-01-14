@@ -21,6 +21,10 @@ function Map(containerId, mapOptions) {
             preset: 'islands#darkGreenDotIcon',
             zIndex: 1000
         },
+		routeBalloon: {
+			preset: 'islands#pinkStretchyIcon',
+			zIndex: 900
+		},
         ambulanceMarker: {
             iconLayout: 'my#ambulanceFree',
             zIndex: 100
@@ -71,7 +75,8 @@ function Map(containerId, mapOptions) {
         behaviors: mapOptions.behaviors ? ['default'] : mapOptions.behaviors,
         controls: mapOptions.controls ? [] : mapOptions.controls,
         ambulancesClustererOptions: mapOptions.ambulancesClustererOptions,
-        displayJams: mapOptions.displayJams || false
+        displayJams: mapOptions.displayJams || false,
+		routeBoundsAutoApply: mapOptions.routeBoundsAutoApply || false
     }
 
     loadScript(self.config.apiUrl, onScriptLoad);
@@ -376,20 +381,40 @@ function Map(containerId, mapOptions) {
      * @param avoidTrafficJams - учитывать пробки при построении маршрута
      */
     this.route = function (routeFrom, routeTo, avoidTrafficJams) {
+		
         this.objects.route = new ymaps.multiRouter.MultiRoute({
             referencePoints: [
                 routeFrom,
                 routeTo
             ],
             params: {
-                results: 2,
+                results: 1,
                 avoidTrafficJams: avoidTrafficJams || false
             }
         }, {
-            boundsAutoApply: true,
+			routeActiveStrokeWidth: 6,
+			routeActiveStrokeColor: "#E63E92",
+            boundsAutoApply: this.config.mapOptions.routeBoundsAutoApply,
             wayPointVisible:false
         });
-        this.layers.routeContainer.add(this.objects.route);
+		
+		this.objects.route.getOverlay().then(function() {
+			alert('event');
+		});
+		
+		var self = this;
+		
+		this.objects.route.model.events.once("requestsuccess", function () {
+            var activeRoute = self.objects.route.getActiveRoute();
+			var segments = activeRoute.getPaths().get(0).getSegments(); // segments.getLength()/2-1
+			var centerPosition = activeRoute.getPaths().get(0).getSegments().get(0).model.geometry.get(0);
+			var durationText = activeRoute.getPaths().get(0).properties.get('durationInTraffic.text');
+			self.layers.routeContainer.add(new ymaps.Placemark(centerPosition, {iconContent: durationText}, self.getMarkerPreset('routeBalloon')));
+			
+        });
+		
+		this.layers.routeContainer.add(this.objects.route);
+		
     }
 
     /**
@@ -398,17 +423,7 @@ function Map(containerId, mapOptions) {
      * @param avoidTrafficJams - учитывать пробки при построении маршрута
      */
     this.routeDefault = function (avoidTrafficJams) {
-        alert('Не реализовано!')
-        /*    var ambulanceMarkers = this.objects.ambulances;
-         var hospitalMarkers = this.map.hospitalMarkers;
-         if (ambulanceMarkers.length == 0 || hospitalMarkers.length == 0) {
-         this.clearRoute();
-         }
-         this.map.route = {
-         routeFrom: ambulanceMarkers[0].position,
-         routeTo: hospitalMarkers[0].position,
-         avoidTrafficJams: avoidTrafficJams
-         };*/
+        console.log('Не реализовано');
     }
 
     /**
