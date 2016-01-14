@@ -18,7 +18,7 @@
 	
 		var pjson = require('./package.json');
 		console.log(pjson.window.runOnDisplay);
-		
+		/*
         var gui = require('nw.gui');
 		var win = gui.Window.get();
 		if (pjson.window.runOnDisplay === "left") {
@@ -27,7 +27,7 @@
 			win.x = window.screen.width+10;
 		}
         win.maximize();
-
+		*/
         /**
 		 * Запуск сервера, в том числе для выдачи статики
 		**/
@@ -97,7 +97,7 @@
                 minClusterSize: 5
             },
 			*/
-            displayJams: false,
+            displayJams: true,
 			routeBoundsAutoApply: false
         });
 

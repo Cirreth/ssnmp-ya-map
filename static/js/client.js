@@ -25,13 +25,25 @@ function Map(containerId, mapOptions) {
 			preset: 'islands#pinkStretchyIcon',
 			zIndex: 900
 		},
-        ambulanceMarker: {
-            iconLayout: 'my#ambulanceFree',
+        primaryMarker: {
+            iconLayout: 'my#ambulancePrimary',
             zIndex: 100
         },
-        ambulanceBusyMarker: {
-            iconLayout: 'my#ambulanceBusy',
+        primaryBusyMarker: {
+            iconLayout: 'my#ambulancePrimaryBusy',
             zIndex: 99
+        },
+		secondaryMarker: {
+            iconLayout: 'my#ambulanceSecondary',
+            zIndex: 50
+        },
+        secondaryBusyMarker: {
+            iconLayout: 'my#ambulanceSecondaryBusy',
+            zIndex: 49
+        },
+		ambulanceDefaultMarker: {
+            iconLayout: 'my#ambulanceDefault',
+            zIndex: 49
         },
         hospitalMarker: {
             iconLayout: 'default#image',
@@ -61,11 +73,20 @@ function Map(containerId, mapOptions) {
     /* Шаблоны для элментов, отображаемых на карте */
     self.layouts = [
         {
-            name: 'my#ambulanceFree',
+            name: 'my#ambulancePrimary',
             template: '<div class="ambulance-layout-container"><div class="ambulance-layout">{{ properties.iconContent }}</div></div>'
-        },{
-            name: 'my#ambulanceBusy',
+        }, {
+            name: 'my#ambulancePrimaryBusy',
             template: '<div class="ambulance-layout-container"><div class="ambulance-layout ambulance-layout-busy">{{ properties.iconContent }}</div></div>'
+        }, {
+            name: 'my#ambulanceSecondary',
+            template: '<div class="ambulance-layout-container"><div class="ambulance-layout ambulance-layout-secondary"></div></div>'
+        }, {
+            name: 'my#ambulanceSecondaryBusy',
+            template: '<div class="ambulance-layout-container"><div class="ambulance-layout ambulance-layout-secondary-busy"></div></div>'
+        }, {
+            name: 'my#ambulanceDefault',
+            template: '<div class="ambulance-layout-container"><div class="ambulance-layout ambulance-layout-default"></div></div>'
         }
     ];
 
@@ -253,10 +274,16 @@ function Map(containerId, mapOptions) {
 	
 	var getPresetByType = function(ambulance) {
 		switch (ambulance.type) {
-			case 'busy':
-				return 'ambulanceBusyMarker';
+			case 'primary-busy':
+				return 'primaryBusyMarker';
+			case 'primary':
+				return 'primaryMarker';
+			case 'secondary':
+				return 'secondaryMarker';
+			case 'secondary-busy':
+				return 'secondaryBusyMarker';
 			default:
-				return 'ambulanceMarker';
+				return 'ambulanceDefaultMarker';
 		}
 	}
 
@@ -406,8 +433,8 @@ function Map(containerId, mapOptions) {
 		
 		this.objects.route.model.events.once("requestsuccess", function () {
             var activeRoute = self.objects.route.getActiveRoute();
-			var segments = activeRoute.getPaths().get(0).getSegments(); // segments.getLength()/2-1
-			var centerPosition = activeRoute.getPaths().get(0).getSegments().get(0).model.geometry.get(0);
+			var segments = activeRoute.getPaths().get(0).getSegments();
+			var centerPosition = activeRoute.getPaths().get(0).getSegments().get(segments.getLength()/2-1).model.geometry.get(0);
 			var durationText = activeRoute.getPaths().get(0).properties.get('durationInTraffic.text');
 			self.layers.routeContainer.add(new ymaps.Placemark(centerPosition, {iconContent: durationText}, self.getMarkerPreset('routeBalloon')));
 			

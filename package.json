@@ -8,8 +8,8 @@
   },
   "author": "",
   "window": {
-    "frame": false,
-    "toolbar": false,
+    "frame": true,
+    "toolbar": true,
     "width": 1000,
     "height": 620,
 	"fullscreen": false,

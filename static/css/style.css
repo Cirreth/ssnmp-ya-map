@@ -26,6 +26,14 @@ header h1 {
     left: 10px;
 }
 
+.placemark_layout_container {
+  position: relative;
+  font-family: Georgia;
+  font-size: 40px;
+  text-align: center;
+  font-weight: bold;
+}
+
 .ambulance-layout-container {
 	position: relative;
 	font-family: Arial;
@@ -49,4 +57,31 @@ header h1 {
 	font-size: 12px;
 	border-color: #666666 !important;
     background-color: #666666 !important;
+}
+
+.ambulance-layout-secondary {
+	padding: 0px;
+	width: 13px;
+	height: 13px;
+	border-radius: 10px;
+	border-color: green;
+	background-color: lightgreen;
+}
+
+.ambulance-layout-secondary-busy {
+	padding: 0px;
+	width: 13px;
+	height: 13px;
+	border-color: #666;
+	border-radius: 10px;
+	background-color: #888;
+}
+
+.ambulance-layout-default {
+	padding: 0px;
+	width: 13px;
+	height: 13px;
+	border-color: darkviolet;
+	border-radius: 10px;
+	background-color: violet;
 }
